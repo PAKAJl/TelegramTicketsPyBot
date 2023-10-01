@@ -21,6 +21,29 @@ class User:
         self.mounth = dateArr[1]
         self.year = dateArr[2]
 
+def atlas_send_message(user, message):
+    tickets = get_parser_atlas_result(user)
+    if tickets == "Error":
+        bot.send_message(message.chat.id, 'Похоже произошла какая то ошибка, попробуйте позже')
+        return
+    if tickets.count == 0:
+        bot.send_message(message.chat.id, 'Билеты не найдены')
+        return
+    msg = 'Atlasbus.by \n'
+    for item in tickets:
+        msg += f'{item.dep_time} \n' 
+        msg += f'{item.dep_place}\n'
+        msg += f'       v \n'
+        msg += f'{item.arr_time} {item.arr_place}\n'
+        msg += f'{item.free_space} Цена - {item.cost} \n'
+        msg += '------------------------------------------------- \n'
+    
+    if len(msg) > 4096:
+        for x in range(0, len(msg), 4096):
+            bot.send_message(message.chat.id, msg[x:x+4096])
+    else:
+        bot.send_message(message.chat.id, msg)
+
 bot=telebot.TeleBot(settings.token)
 @bot.message_handler(commands=['start'])
 def start_message(message):
@@ -45,13 +68,12 @@ def first_town_message(message):
     bot.register_next_step_handler(msg, sec_town_message)
 
 def sec_town_message(message):
+    
     user = user_dict[message.chat.id]
     user.sec_town = message.text
     user_dict[message.chat.id] = user
     msg = bot.send_message(message.chat.id,"Введите дату отправлления в формате ДД.ММ.ГГГГ")
-    bot.register_next_step_handler(msg, date_message)
-    
-    
+    bot.register_next_step_handler(msg, date_message)  
 def date_message(message):
     user = user_dict[message.chat.id]
     user.date = message.text
@@ -61,20 +83,10 @@ def date_message(message):
     if  pattern.search(user.date) is not None:
         user.date_split()
         bot.send_message(message.chat.id, 'Обрабатываем ваш запрос...')
-        tickets = get_parser_atlas_result(user)
-        msg = 'Atlasbus.by \n'
-        for item in tickets:
-            msg += f'{item.dep_time} \n' 
-            msg += f'{item.dep_place}\n'
-            msg += f'       v \n'
-            msg += f'{item.arr_time} {item.arr_place}\n'
-            msg += f'{item.free_space} Цена - {item.cost} \n'
-            msg += '------------------------------------------------- \n'
-        bot.send_message(message.chat.id, msg)
+        atlas_send_message(user, message)
             
     else:
         msg = bot.send_message(message.chat.id,"Ой, что-то пошло не так. Введите дату отправлления в формате ДД.ММ.ГГГГ")
         bot.register_next_step_handler(msg, date_message)
-        
 
 bot.infinity_polling()
