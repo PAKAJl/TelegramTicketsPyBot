@@ -1,15 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
- 
-
-class Ticket:
-    def __init__(self):
-        self.dep_time = None
-        self.arr_time = None
-        self.free_space = None
-        self.dep_place = None
-        self.arr_place = None
-        self.cost = None
+import base 
 
 
 def get_html(url):
