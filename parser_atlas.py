@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
-import base 
+from base import User, Ticket
 
 
 def get_html(url):
