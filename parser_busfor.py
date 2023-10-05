@@ -15,19 +15,22 @@ def parser_busfor_result(user:User):
     submit_button.click()
     time.sleep(3)
     html = driver.page_source
+    print(driver.current_url)
     soup = BeautifulSoup(html, "lxml")
     tickets = soup.find_all('div', class_='ticket')
-    result = ''
+    result = []
     for item in tickets:
-        #ticket = Ticket()
-        #eticket_info = item.find('div').find_all('div')[1].find_all('div')[0].find_all("div")
-        #eticket_time_spot = eticket_info[0].find("div").find_all("div")
-        #ticket.dep_time = eticket_time_spot[0].find("div").find("div").text
-        #test =eticket_time_spot[0].find_all('div')[1]
-        #ticket.dep_place = ''
-        #result.append(ticket)
-        return(tickets)
+        ticket = Ticket()
         
+        ticket.dep_time = item.find('div', class_='Style__Time-sc-1n9rkhj-0 bmnWRj').text
+        ticket.dep_place = item.find('div', class_='Style__Title-yh63zd-5 cspGxb').text + ', ' + item.find('div', class_='Style__Description-yh63zd-6 eKkHly').text
+        ticket.arr_time = item.find_all('div', class_='Style__Time-sc-1n9rkhj-0 bmnWRj')[1].text
+        ticket.arr_place = item.find_all('div', class_='Style__Title-yh63zd-5 cspGxb')[1].text + ', ' + item.find_all('div', class_='Style__Description-yh63zd-6 eKkHly')[1].text
+        ticket.cost = item.find('span', class_='price text-nowrap').text + item.find('span', class_='price__fraction').text
+        ticket.free_space = item.find('span', class_='TripFreeSeats__Seats-cj6o3m-0 dEMWiJ').text
+        result.append(ticket)
+    return(result)
+
         
         
         
@@ -37,7 +40,7 @@ def parser_busfor_result(user:User):
     
 #for test
 user = User()
-user.date = '04.10.2023'
+user.date = '09.10.2023'
 user.first_town = 'Гродно'
 user.sec_town = 'Минск'
 user.date_split()
