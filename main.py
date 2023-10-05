@@ -2,8 +2,8 @@ import telebot
 from telebot import types
 import settings
 import re
-from parser_atlas import get_parser_atlas_result, Ticket
-import base
+from parser_atlas import get_parser_atlas_result
+from base import User, Ticket
 
 
 user_dict = {}
